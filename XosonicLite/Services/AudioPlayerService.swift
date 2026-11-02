@@ -11,7 +11,7 @@ public final class AudioPlayerService: NSObject, ObservableObject {
     private let cacheManager = RollingCacheManager.shared
 
     @Published public private(set) var currentTrack: Track?
-    @Published public private(set) var isPlaying: Boolean = false
+    @Published public private(set) var isPlaying: Bool = false
     @Published public var currentTime: Double = 0
     @Published public var duration: Double = 0
     @Published public var playlist: [Track] = []
