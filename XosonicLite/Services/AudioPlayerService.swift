@@ -224,6 +224,47 @@ public final class AudioPlayerService: NSObject, ObservableObject {
         player?.seek(to: time)
     }
 
+    public func playLocalAudioFile(url: URL) {
+        _ = url.startAccessingSecurityScopedResource()
+        let filename = url.deletingPathExtension().lastPathComponent
+        let track = Track(
+            id: "local_\(UUID().uuidString)",
+            title: filename,
+            artist: "Local Audio",
+            thumbnailUrl: nil,
+            durationSeconds: 0,
+            streamUrl: url.absoluteString
+        )
+        self.currentTrack = track
+        self.playlist = [track]
+        self.currentIndex = 0
+
+        cleanUpPlayer()
+        let playerItem = AVPlayerItem(url: url)
+        player = AVPlayer(playerItem: playerItem)
+
+        let interval = CMTime(seconds: 0.5, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        timeObserverToken = player?.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
+            guard let self = self else { return }
+            self.currentTime = time.seconds
+            if let currentItem = self.player?.currentItem, currentItem.duration.isValid && currentItem.duration.seconds > 0 {
+                self.duration = currentItem.duration.seconds
+            }
+            self.updateNowPlayingInfo()
+        }
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(itemDidFinishPlaying),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: playerItem
+        )
+
+        player?.play()
+        isPlaying = true
+        updateNowPlayingInfo()
+    }
+
     private func cleanUpPlayer() {
         if let token = timeObserverToken {
             player?.removeTimeObserver(token)

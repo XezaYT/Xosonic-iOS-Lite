@@ -1,9 +1,11 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 public struct SearchView: View {
     @State private var searchText: String = ""
     @State private var results: [Track] = []
     @State private var isLoading: Bool = false
+    @State private var showFileImporter: Bool = false
     @ObservedObject var player = AudioPlayerService.shared
 
     public init() {}
@@ -108,6 +110,25 @@ public struct SearchView: View {
             }
             .navigationTitle("Search")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showFileImporter = true }) {
+                        Image(systemName: "folder.badge.plus")
+                            .foregroundColor(.white)
+                    }
+                }
+            }
+            .fileImporter(
+                isPresented: $showFileImporter,
+                allowedContentTypes: [.audio, .mp3, .wav, .aiff]
+            ) { result in
+                switch result {
+                case .success(let url):
+                    AudioPlayerService.shared.playLocalAudioFile(url: url)
+                case .failure(let error):
+                    print("[XosonicLite] File importer error: \(error.localizedDescription)")
+                }
+            }
         }
     }
 

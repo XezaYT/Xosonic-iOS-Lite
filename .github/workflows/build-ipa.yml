@@ -39,6 +39,8 @@ jobs:
         run: |
           mkdir -p Payload
           cp -r build/XosonicLite.xcarchive/Products/Applications/XosonicLite.app Payload/
+          cp XosonicLite/Resources/AppIcon.png Payload/XosonicLite.app/AppIcon.png || true
+          cp XosonicLite/Resources/AppIcon.png Payload/XosonicLite.app/AppIcon60x60@2x.png || true
           zip -r -q Xosonic-Lite-iOS.ipa Payload
           ls -lh Xosonic-Lite-iOS.ipa
 
