@@ -231,8 +231,8 @@ public final class AudioPlayerService: NSObject, ObservableObject {
             id: "local_\(UUID().uuidString)",
             title: filename,
             artist: "Local Audio",
-            thumbnailUrl: nil,
             durationSeconds: 0,
+            thumbnailUrl: nil,
             streamUrl: url.absoluteString
         )
         self.currentTrack = track
